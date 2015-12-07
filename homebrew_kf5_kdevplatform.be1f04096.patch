@@ -1,0 +1,56 @@
+commit be1f04096c05a4402e1df0420c9a2d1b20edbee8
+Author: Andrew McCann <amccann@gmail.com>
+Date:   Tue Nov 10 14:50:26 2015 -0800
+
+    Make assistantpopup qml load from resource
+
+diff --git a/shell/CMakeLists.txt b/shell/CMakeLists.txt
+index fdd5fb3..340e0a6 100644
+--- a/shell/CMakeLists.txt
++++ b/shell/CMakeLists.txt
+@@ -172,5 +172,3 @@ install(FILES
+     filteredproblemstore.h
+     DESTINATION ${KDE_INSTALL_INCLUDEDIR}/kdevplatform/shell COMPONENT Devel
+ )
+-
+-install( FILES AssistantButton.qml assistantpopup.qml DESTINATION ${KDE_INSTALL_DATADIR}/kdevelop )
+diff --git a/shell/assistantpopup.cpp b/shell/assistantpopup.cpp
+index efd8249..1bc1a06 100644
+--- a/shell/assistantpopup.cpp
++++ b/shell/assistantpopup.cpp
+@@ -176,7 +176,19 @@ AssistantPopup::AssistantPopup()
+ 
+     rootContext()->setContextProperty("config", m_config);
+ 
+-    setSource(QUrl::fromLocalFile(QStandardPaths::locate(QStandardPaths::GenericDataLocation, "kdevelop/assistantpopup.qml")));
++    QUrl qmlURL;
++    {
++        QLatin1String qmlString("kdevelop/assistantpopup.qml");
++        
++        auto qmlPath = QStandardPaths::locate(QStandardPaths::GenericDataLocation, qmlString);
++        
++        if (!qmlPath.isEmpty()) {
++            qmlURL = QUrl::fromLocalFile(qmlPath);
++        } else {
++            qmlURL = QUrl(QLatin1String("qrc:/")+qmlString);
++        }
++    }
++    setSource(qmlURL);
+     if (!rootObject()) {
+         qWarning() << "Failed to load assistant markup! The assistant will not work.";
+     } else {
+diff --git a/shell/kdevplatformshell.qrc b/shell/kdevplatformshell.qrc
+index 4b75ba1..8436cc5 100644
+--- a/shell/kdevplatformshell.qrc
++++ b/shell/kdevplatformshell.qrc
+@@ -9,4 +9,10 @@
+     <qresource prefix="/kxmlgui5/kdevdebugger">
+         <file alias="kdevdebuggershellui.rc">debugger/kdevdebuggershellui.rc</file>
+     </qresource>
++    <qresource prefix="/kdevelop">
++        <file>AssistantButton.qml</file>
++    </qresource>
++    <qresource prefix="/kdevelop">
++        <file>assistantpopup.qml</file>
++    </qresource>
+ </RCC>

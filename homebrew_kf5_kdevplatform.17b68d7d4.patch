@@ -1,0 +1,606 @@
+commit 17b68d7d4f673d38f3b18bbf878bade8ab2bd2f2
+Author: Andrew McCann <amccann@gmail.com>
+Date:   Thu Nov 12 04:45:30 2015 -0800
+
+    make plugins load installed data from resources if not found in filesystem
+    
+    Summary: Store plugin data in qt5's resource system
+    
+    Test Plan: Compile, remove file from 'regular' system locations, ensure related feature still functions
+    
+    Reviewers: kfunk, apol, mwolff
+    
+    Reviewed By: apol, mwolff
+    
+    Subscribers: apol, kdevelop-devel
+    
+    Projects: #kdevelop
+    
+    Differential Revision: https://phabricator.kde.org/D528
+
+diff --git a/plugins/appwizard/CMakeLists.txt b/plugins/appwizard/CMakeLists.txt
+index 23813e8..5288db4 100644
+--- a/plugins/appwizard/CMakeLists.txt
++++ b/plugins/appwizard/CMakeLists.txt
+@@ -18,6 +18,7 @@ set(kdevappwizard_PART_UI
+ 
+ ki18n_wrap_ui(kdevappwizard_PART_SRCS ${kdevappwizard_PART_UI})
+ 
++qt5_add_resources(kdevappwizard_PART_SRCS kdevappwizard.qrc)
+ kdevplatform_add_plugin(kdevappwizard JSON kdevappwizard.json SOURCES ${kdevappwizard_PART_SRCS})
+ 
+ target_link_libraries(kdevappwizard
+@@ -29,7 +30,3 @@ target_link_libraries(kdevappwizard
+ install(TARGETS kdevappwizard DESTINATION ${KDE_INSTALL_PLUGINDIR}/kdevplatform/${KDEV_PLUGIN_VERSION} )
+ 
+ 
+-########### install files ###############
+-
+-install( FILES kdevappwizard.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdevappwizard )
+-install( FILES kdevappwizard.knsrc DESTINATION ${KDE_INSTALL_CONFDIR} )
+diff --git a/plugins/appwizard/kdevappwizard.qrc b/plugins/appwizard/kdevappwizard.qrc
+new file mode 100644
+index 0000000..01c24c6
+--- /dev/null
++++ b/plugins/appwizard/kdevappwizard.qrc
+@@ -0,0 +1,9 @@
++<!DOCTYPE RCC>
++<RCC version="1.0">
++    <qresource prefix="/kxmlgui5/kdevappwizard">
++        <file>kdevappwizard.rc</file>
++    </qresource>
++    <qresource prefix="/kconfig">
++        <file>kdevappwizard.knsrc</file>
++    </qresource>
++</RCC>
+diff --git a/plugins/classbrowser/CMakeLists.txt b/plugins/classbrowser/CMakeLists.txt
+index ca55927..2f6f155 100644
+--- a/plugins/classbrowser/CMakeLists.txt
++++ b/plugins/classbrowser/CMakeLists.txt
+@@ -18,10 +18,7 @@ set(kdevclassbrowser_PART_SRCS
+     classtree.cpp
+ )
+ 
++qt5_add_resources(kdevclassbrowser_PART_SRCS kdevclassbrowser.qrc)
+ kdevplatform_add_plugin(kdevclassbrowser JSON kdevclassbrowser.json SOURCES ${kdevclassbrowser_PART_SRCS})
+ 
+ target_link_libraries(kdevclassbrowser KF5::TextEditor KDev::Util KDev::Language KDev::Interfaces KDev::Project)
+-
+-########### install files ###############
+-
+-install(FILES kdevclassbrowser.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdevclassbrowser)
+diff --git a/plugins/classbrowser/kdevclassbrowser.qrc b/plugins/classbrowser/kdevclassbrowser.qrc
+new file mode 100644
+index 0000000..f57aa23
+--- /dev/null
++++ b/plugins/classbrowser/kdevclassbrowser.qrc
+@@ -0,0 +1,6 @@
++<!DOCTYPE RCC>
++<RCC version="1.0">
++    <qresource prefix="/kxmlgui5/kdevclassbrowser">
++        <file>kdevclassbrowser.rc</file>
++    </qresource>
++</RCC>
+diff --git a/plugins/codeutils/CMakeLists.txt b/plugins/codeutils/CMakeLists.txt
+index 2bc8cd6..32062cb 100644
+--- a/plugins/codeutils/CMakeLists.txt
++++ b/plugins/codeutils/CMakeLists.txt
+@@ -9,6 +9,7 @@ set(kdevcodeutils_PART_SRCS
+ 
+ include_directories(CMAKE_CURRENT_BINARY_DIR)
+ 
++qt5_add_resources(kdevcodeutils_PART_SRCS kdevcodeutils.qrc)
+ kdevplatform_add_plugin(kdevcodeutils JSON kdevcodeutils.json SOURCES ${kdevcodeutils_PART_SRCS})
+ 
+ target_link_libraries(kdevcodeutils
+@@ -21,7 +22,3 @@ target_link_libraries(kdevcodeutils
+ )
+ 
+ add_subdirectory(doc_templates)
+-
+-########### install files ###############
+-
+-install( FILES kdevcodeutils.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdevcodeutils )
+diff --git a/plugins/codeutils/kdevcodeutils.qrc b/plugins/codeutils/kdevcodeutils.qrc
+new file mode 100644
+index 0000000..940e535
+--- /dev/null
++++ b/plugins/codeutils/kdevcodeutils.qrc
+@@ -0,0 +1,6 @@
++<!DOCTYPE RCC>
++<RCC version="1.0">
++    <qresource prefix="/kxmlgui5/kdevcodeutils">
++        <file>kdevcodeutils.rc</file>
++    </qresource>
++</RCC>
+diff --git a/plugins/contextbrowser/CMakeLists.txt b/plugins/contextbrowser/CMakeLists.txt
+index 777de6b..a77c8bb 100644
+--- a/plugins/contextbrowser/CMakeLists.txt
++++ b/plugins/contextbrowser/CMakeLists.txt
+@@ -8,8 +8,7 @@ set(kdevcontextbrowser_PART_SRCS
+     browsemanager.cpp
+ )
+ 
++qt5_add_resources(kdevcontextbrowser_PART_SRCS kdevcontextbrowser.qrc)
+ kdevplatform_add_plugin(kdevcontextbrowser JSON kdevcontextbrowser.json SOURCES ${kdevcontextbrowser_PART_SRCS})
+ 
+ target_link_libraries(kdevcontextbrowser KDev::Interfaces KDev::Util KDev::Language KDev::Sublime KF5::TextEditor KF5::Parts)
+-
+-install(FILES kdevcontextbrowser.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdevcontextbrowser)
+diff --git a/plugins/contextbrowser/kdevcontextbrowser.qrc b/plugins/contextbrowser/kdevcontextbrowser.qrc
+new file mode 100644
+index 0000000..2ef4294
+--- /dev/null
++++ b/plugins/contextbrowser/kdevcontextbrowser.qrc
+@@ -0,0 +1,6 @@
++<!DOCTYPE RCC>
++<RCC version="1.0">
++    <qresource prefix="/kxmlgui5/kdevcontextbrowser">
++        <file>kdevcontextbrowser.rc</file>
++    </qresource>
++</RCC>
+diff --git a/plugins/cvs/CMakeLists.txt b/plugins/cvs/CMakeLists.txt
+index e0b61a0..0dbecd7 100644
+--- a/plugins/cvs/CMakeLists.txt
++++ b/plugins/cvs/CMakeLists.txt
+@@ -32,6 +32,7 @@ set(kdevcvs_PART_UI
+ 
+ ki18n_wrap_ui(kdevcvs_PART_SRCS ${kdevcvs_PART_UI})
+ 
++qt5_add_resources(kdevcvs_PART_SRCS kdevcvs.qrc)
+ kdevplatform_add_plugin(kdevcvs JSON kdevcvs.json SOURCES ${kdevcvs_PART_SRCS})
+ 
+ target_link_libraries(kdevcvs
+@@ -42,8 +43,4 @@ target_link_libraries(kdevcvs
+     KDev::Vcs
+     KDev::Project
+     KDev::Language
+-)
+-
+-########### install files ###############
+-
+-install( FILES kdevcvs.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdevcvs )
++)
+\ No newline at end of file
+diff --git a/plugins/cvs/kdevcvs.qrc b/plugins/cvs/kdevcvs.qrc
+new file mode 100644
+index 0000000..88498fe
+--- /dev/null
++++ b/plugins/cvs/kdevcvs.qrc
+@@ -0,0 +1,6 @@
++<!DOCTYPE RCC>
++<RCC version="1.0">
++    <qresource prefix="/kxmlgui5/kdevcvs">
++        <file>kdevcvs.rc</file>
++    </qresource>
++</RCC>
+diff --git a/plugins/documentswitcher/CMakeLists.txt b/plugins/documentswitcher/CMakeLists.txt
+index 2fb580e..2e94dda 100644
+--- a/plugins/documentswitcher/CMakeLists.txt
++++ b/plugins/documentswitcher/CMakeLists.txt
+@@ -8,12 +8,7 @@ set(kdevdocumentswitcher_PART_SRCS
+     documentswitchertreeview.cpp
+ )
+ 
++qt5_add_resources(kdevdocumentswitcher_PART_SRCS kdevdocumentswitcher.qrc)
+ kdevplatform_add_plugin(kdevdocumentswitcher JSON kdevdocumentswitcher.json SOURCES ${kdevdocumentswitcher_PART_SRCS})
+ 
+ target_link_libraries(kdevdocumentswitcher KDev::Interfaces KDev::Sublime KDev::Interfaces )
+-
+-########### install files ###############
+-
+-install( FILES kdevdocumentswitcher.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdevdocumentswitcher )
+-
+-
+diff --git a/plugins/documentswitcher/kdevdocumentswitcher.qrc b/plugins/documentswitcher/kdevdocumentswitcher.qrc
+new file mode 100644
+index 0000000..144cf20
+--- /dev/null
++++ b/plugins/documentswitcher/kdevdocumentswitcher.qrc
+@@ -0,0 +1,6 @@
++<!DOCTYPE RCC>
++<RCC version="1.0">
++    <qresource prefix="/kxmlgui5/kdevdocumentswitcher">
++        <file>kdevdocumentswitcher.rc</file>
++    </qresource>
++</RCC>
+diff --git a/plugins/documentview/CMakeLists.txt b/plugins/documentview/CMakeLists.txt
+index d052378..aba4089 100644
+--- a/plugins/documentview/CMakeLists.txt
++++ b/plugins/documentview/CMakeLists.txt
+@@ -12,14 +12,10 @@ set(kdevdocumentview_PART_SRCS
+     kdevdocumentselection.cpp
+ )
+ 
++qt5_add_resources(kdevdocumentview_PART_SRCS kdevdocumentview.qrc)
+ kdevplatform_add_plugin(kdevdocumentview JSON kdevdocumentview.json SOURCES ${kdevdocumentview_PART_SRCS})
+ 
+ target_link_libraries(kdevdocumentview
+     KDev::Interfaces
+     KF5::TextEditor
+ )
+-
+-########### install files ###############
+-
+-install( FILES kdevdocumentview.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdevdocumentview )
+-
+diff --git a/plugins/documentview/kdevdocumentview.qrc b/plugins/documentview/kdevdocumentview.qrc
+new file mode 100644
+index 0000000..a521850
+--- /dev/null
++++ b/plugins/documentview/kdevdocumentview.qrc
+@@ -0,0 +1,6 @@
++<!DOCTYPE RCC>
++<RCC version="1.0">
++    <qresource prefix="/kxmlgui5/kdevdocumentview">
++        <file>kdevdocumentview.rc</file>
++    </qresource>
++</RCC>
+diff --git a/plugins/externalscript/CMakeLists.txt b/plugins/externalscript/CMakeLists.txt
+index 6ab9a20..099de0b 100644
+--- a/plugins/externalscript/CMakeLists.txt
++++ b/plugins/externalscript/CMakeLists.txt
+@@ -17,6 +17,7 @@ set(kdevexternalscript_PART_UI
+ 
+ ki18n_wrap_ui(kdevexternalscript_PART_SRCS ${kdevexternalscript_PART_UI})
+ 
++qt5_add_resources(kdevexternalscript_PART_SRCS kdevexternalscript.qrc)
+ kdevplatform_add_plugin(kdevexternalscript JSON kdevexternalscript.json SOURCES ${kdevexternalscript_PART_SRCS})
+ 
+ target_link_libraries(kdevexternalscript
+@@ -24,7 +25,3 @@ target_link_libraries(kdevexternalscript
+     KDev::Language KDev::Interfaces KDev::Project
+     KDev::Util KDev::OutputView
+ )
+-
+-########### install files ###############
+-
+-install( FILES kdevexternalscript.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdevexternalscript )
+diff --git a/plugins/externalscript/kdevexternalscript.qrc b/plugins/externalscript/kdevexternalscript.qrc
+new file mode 100644
+index 0000000..61a9310
+--- /dev/null
++++ b/plugins/externalscript/kdevexternalscript.qrc
+@@ -0,0 +1,6 @@
++<!DOCTYPE RCC>
++<RCC version="1.0">
++    <qresource prefix="/kxmlgui5/kdevexternalscript">
++        <file>kdevexternalscript.rc</file>
++    </qresource>
++</RCC>
+diff --git a/plugins/filemanager/CMakeLists.txt b/plugins/filemanager/CMakeLists.txt
+index 2fe3c48..3a5b211 100644
+--- a/plugins/filemanager/CMakeLists.txt
++++ b/plugins/filemanager/CMakeLists.txt
+@@ -5,7 +5,6 @@ set(kdevfilemanager_PART_SRCS
+     filemanager.cpp
+     bookmarkhandler.cpp
+ )
++qt5_add_resources(kdevfilemanager_PART_SRCS kdevfilemanager.qrc)
+ kdevplatform_add_plugin(kdevfilemanager JSON kdevfilemanager.json SOURCES ${kdevfilemanager_PART_SRCS})
+ target_link_libraries(kdevfilemanager KF5::Bookmarks KF5::KIOCore KF5::KIOFileWidgets KF5::KIOWidgets KF5::TextEditor KDev::Interfaces)
+-
+-install( FILES kdevfilemanager.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdevfilemanager )
+diff --git a/plugins/filemanager/kdevfilemanager.qrc b/plugins/filemanager/kdevfilemanager.qrc
+new file mode 100644
+index 0000000..fe8ab16
+--- /dev/null
++++ b/plugins/filemanager/kdevfilemanager.qrc
+@@ -0,0 +1,6 @@
++<!DOCTYPE RCC>
++<RCC version="1.0">
++    <qresource prefix="/kxmlgui5/kdevfilemanager">
++        <file>kdevfilemanager.rc</file>
++    </qresource>
++</RCC>
+diff --git a/plugins/filetemplates/CMakeLists.txt b/plugins/filetemplates/CMakeLists.txt
+index 0894ce3..9fdb24e 100644
+--- a/plugins/filetemplates/CMakeLists.txt
++++ b/plugins/filetemplates/CMakeLists.txt
+@@ -27,6 +27,7 @@ ki18n_wrap_ui(kdevfiletemplates_PART_SRCS
+     ui/testcases.ui
+ )
+ 
++qt5_add_resources(kdevfiletemplates_PART_SRCS kdevfiletemplates.qrc)
+ kdevplatform_add_plugin(kdevfiletemplates JSON kdevfiletemplates.json SOURCES ${kdevfiletemplates_PART_SRCS})
+ 
+ target_link_libraries(kdevfiletemplates
+@@ -41,9 +42,6 @@ target_link_libraries(kdevfiletemplates
+ 
+ ########### install files ###############
+ 
+-install( FILES kdevfiletemplates.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdevfiletemplates )
+-install( FILES kdevfiletemplates.knsrc DESTINATION ${KDE_INSTALL_CONFDIR} )
+-
+ install(FILES
+ licenses/GPL\ v2
+ licenses/GPL\ v3
+diff --git a/plugins/filetemplates/kdevfiletemplates.qrc b/plugins/filetemplates/kdevfiletemplates.qrc
+new file mode 100644
+index 0000000..e1e9ff4
+--- /dev/null
++++ b/plugins/filetemplates/kdevfiletemplates.qrc
+@@ -0,0 +1,9 @@
++<!DOCTYPE RCC>
++<RCC version="1.0">
++    <qresource prefix="/kxmlgui5/kdevfiletemplates">
++        <file>kdevfiletemplates.rc</file>
++    </qresource>
++    <qresource prefix="/kconfig">
++        <file>kdevfiletemplates.knsrc</file>
++    </qresource>
++</RCC>
+diff --git a/plugins/grepview/CMakeLists.txt b/plugins/grepview/CMakeLists.txt
+index d84d44f..b190689 100644
+--- a/plugins/grepview/CMakeLists.txt
++++ b/plugins/grepview/CMakeLists.txt
+@@ -22,6 +22,7 @@ set(kdevgrepview_PART_UI
+ 
+ ki18n_wrap_ui(kdevgrepview_PART_SRCS ${kdevgrepview_PART_UI})
+ 
++qt5_add_resources(kdevgrepview_PART_SRCS kdevgrepview.qrc)
+ kdevplatform_add_plugin(kdevgrepview JSON kdevgrepview.json SOURCES ${kdevgrepview_PART_SRCS})
+ 
+ target_link_libraries(kdevgrepview
+@@ -38,6 +39,4 @@ target_link_libraries(kdevgrepview
+ 
+ ########### install files ###############
+ 
+-install( FILES kdevgrepview.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdevgrepview )
+-
+ add_subdirectory(tests)
+diff --git a/plugins/grepview/kdevgrepview.qrc b/plugins/grepview/kdevgrepview.qrc
+new file mode 100644
+index 0000000..935e618
+--- /dev/null
++++ b/plugins/grepview/kdevgrepview.qrc
+@@ -0,0 +1,6 @@
++<!DOCTYPE RCC>
++<RCC version="1.0">
++    <qresource prefix="/kxmlgui5/kdevgrepview">
++        <file>kdevgrepview.rc</file>
++    </qresource>
++</RCC>
+diff --git a/plugins/patchreview/CMakeLists.txt b/plugins/patchreview/CMakeLists.txt
+index 206186f..90c9f43 100644
+--- a/plugins/patchreview/CMakeLists.txt
++++ b/plugins/patchreview/CMakeLists.txt
+@@ -20,12 +20,10 @@ set(patchreview_PART_SRCS
+ 
+ ki18n_wrap_ui(patchreview_PART_SRCS patchreview.ui localpatchwidget.ui)
+ 
++qt5_add_resources(patchreview_PART_SRCS kdevpatchreview.qrc)
+ kdevplatform_add_plugin(kdevpatchreview JSON kdevpatchreview.json SOURCES ${patchreview_PART_SRCS})
+ target_link_libraries(kdevpatchreview KF5::IconThemes KF5::TextEditor KF5::Parts KDev::Interfaces KDev::Util KDev::Language KDev::Vcs KDev::Sublime ${LIBKOMPAREDIFF2_LIBRARIES})
+ if (KDEExperimentalPurpose_FOUND)
+     target_compile_definitions(kdevpatchreview PRIVATE WITH_PURPOSE)
+     target_link_libraries(kdevpatchreview KDEExperimental::PurposeWidgets)
+ endif()
+-########### install files ###############
+-
+-install(FILES kdevpatchreview.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdevpatchreview)
+diff --git a/plugins/patchreview/kdevpatchreview.qrc b/plugins/patchreview/kdevpatchreview.qrc
+new file mode 100644
+index 0000000..25c54e3
+--- /dev/null
++++ b/plugins/patchreview/kdevpatchreview.qrc
+@@ -0,0 +1,6 @@
++<!DOCTYPE RCC>
++<RCC version="1.0">
++    <qresource prefix="/kxmlgui5/kdevpatchreview">
++        <file>kdevpatchreview.rc</file>
++    </qresource>
++</RCC>
+diff --git a/plugins/problemreporter/CMakeLists.txt b/plugins/problemreporter/CMakeLists.txt
+index dc9cb38..10afdb7 100644
+--- a/plugins/problemreporter/CMakeLists.txt
++++ b/plugins/problemreporter/CMakeLists.txt
+@@ -11,11 +11,8 @@ set(kdevproblemreporter_PART_SRCS
+     problemreportermodel.cpp
+ )
+ 
++qt5_add_resources(kdevproblemreporter_PART_SRCS kdevproblemreporter.qrc)
+ kdevplatform_add_plugin(kdevproblemreporter JSON kdevproblemreporter.json SOURCES ${kdevproblemreporter_PART_SRCS})
+ target_link_libraries(kdevproblemreporter KF5::TextEditor KF5::Parts KDev::Language KDev::Interfaces KDev::Util KDev::Project KDev::Shell)
+ 
+-########### install files ###############
+-
+-install(FILES kdevproblemreporter.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdevproblemreporter)
+-
+ add_subdirectory(tests)
+diff --git a/plugins/problemreporter/kdevproblemreporter.qrc b/plugins/problemreporter/kdevproblemreporter.qrc
+new file mode 100644
+index 0000000..b40770f
+--- /dev/null
++++ b/plugins/problemreporter/kdevproblemreporter.qrc
+@@ -0,0 +1,6 @@
++<!DOCTYPE RCC>
++<RCC version="1.0">
++    <qresource prefix="/kxmlgui5/kdevproblemreporter">
++        <file>kdevproblemreporter.rc</file>
++    </qresource>
++</RCC>
+diff --git a/plugins/projectmanagerview/CMakeLists.txt b/plugins/projectmanagerview/CMakeLists.txt
+index cd045e1..1b955b1 100644
+--- a/plugins/projectmanagerview/CMakeLists.txt
++++ b/plugins/projectmanagerview/CMakeLists.txt
+@@ -13,6 +13,7 @@ set(kdevprojectmanagerview_PLUGIN_SRCS
+ 
+ ki18n_wrap_ui( kdevprojectmanagerview_PLUGIN_SRCS projectbuildsetwidget.ui projectmanagerview.ui )
+ 
++qt5_add_resources(kdevprojectmanagerview_PLUGIN_SRCS kdevprojectmanagerview.qrc)
+ kdevplatform_add_plugin(kdevprojectmanagerview JSON kdevprojectmanagerview.json SOURCES ${kdevprojectmanagerview_PLUGIN_SRCS})
+ 
+ target_link_libraries(kdevprojectmanagerview
+@@ -20,8 +21,5 @@ target_link_libraries(kdevprojectmanagerview
+     KF5::ThreadWeaver
+     KDev::Interfaces KDev::Project KDev::Language KDev::Util KDev::Vcs KDev::Sublime )
+ 
+-########### install files ###############
+-
+-install( FILES kdevprojectmanagerview.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdevprojectmanagerview )
+ 
+ 
+diff --git a/plugins/projectmanagerview/kdevprojectmanagerview.qrc b/plugins/projectmanagerview/kdevprojectmanagerview.qrc
+new file mode 100644
+index 0000000..0537037
+--- /dev/null
++++ b/plugins/projectmanagerview/kdevprojectmanagerview.qrc
+@@ -0,0 +1,6 @@
++<!DOCTYPE RCC>
++<RCC version="1.0">
++    <qresource prefix="/kxmlgui5/kdevprojectmanagerview">
++        <file>kdevprojectmanagerview.rc</file>
++    </qresource>
++</RCC>
+diff --git a/plugins/quickopen/CMakeLists.txt b/plugins/quickopen/CMakeLists.txt
+index 106a712..e580751 100644
+--- a/plugins/quickopen/CMakeLists.txt
++++ b/plugins/quickopen/CMakeLists.txt
+@@ -24,9 +24,7 @@ set (
+ 
+ ki18n_wrap_ui(kdevquickopen_PART_SRCS ${kdevquickopen_UI})
+ 
++qt5_add_resources(kdevquickopen_PART_SRCS kdevquickopen.qrc)
+ kdevplatform_add_plugin(kdevquickopen JSON kdevquickopen.json SOURCES ${kdevquickopen_PART_SRCS})
+ target_link_libraries(kdevquickopen KF5::IconThemes KF5::GuiAddons KF5::TextEditor KDev::Language KDev::Interfaces KDev::Project KDev::Util)
+ 
+-########### install files ###############
+-
+-install(FILES kdevquickopen.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdevquickopen)
+diff --git a/plugins/quickopen/kdevquickopen.qrc b/plugins/quickopen/kdevquickopen.qrc
+new file mode 100644
+index 0000000..cff5bac
+--- /dev/null
++++ b/plugins/quickopen/kdevquickopen.qrc
+@@ -0,0 +1,6 @@
++<!DOCTYPE RCC>
++<RCC version="1.0">
++    <qresource prefix="/kxmlgui5/kdevquickopen">
++        <file>kdevquickopen.rc</file>
++    </qresource>
++</RCC>
+diff --git a/plugins/standardoutputview/CMakeLists.txt b/plugins/standardoutputview/CMakeLists.txt
+index c93059d..485788c 100644
+--- a/plugins/standardoutputview/CMakeLists.txt
++++ b/plugins/standardoutputview/CMakeLists.txt
+@@ -10,6 +10,7 @@ set(standardoutputview_LIB_SRCS
+     standardoutputviewmetadata.cpp
+ )
+ 
++qt5_add_resources(standardoutputview_LIB_SRCS kdevstandardoutputview.qrc)
+ kdevplatform_add_plugin(kdevstandardoutputview JSON kdevstandardoutputview.json SOURCES  ${standardoutputview_LIB_SRCS})
+ 
+ target_link_libraries(kdevstandardoutputview
+@@ -19,5 +20,3 @@ target_link_libraries(kdevstandardoutputview
+     KDev::OutputView
+ )
+ 
+-install( FILES kdevstandardoutputview.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdevstandardoutputview )
+-
+diff --git a/plugins/standardoutputview/kdevstandardoutputview.qrc b/plugins/standardoutputview/kdevstandardoutputview.qrc
+new file mode 100644
+index 0000000..a1a16ce
+--- /dev/null
++++ b/plugins/standardoutputview/kdevstandardoutputview.qrc
+@@ -0,0 +1,6 @@
++<!DOCTYPE RCC>
++<RCC version="1.0">
++    <qresource prefix="/kxmlgui5/kdevstandardoutputview">
++        <file>kdevstandardoutputview.rc</file>
++    </qresource>
++</RCC>
+diff --git a/plugins/switchtobuddy/CMakeLists.txt b/plugins/switchtobuddy/CMakeLists.txt
+index c935ac1..3b430c0 100644
+--- a/plugins/switchtobuddy/CMakeLists.txt
++++ b/plugins/switchtobuddy/CMakeLists.txt
+@@ -7,11 +7,10 @@ set(kdevswitchtobuddy_PART_SRCS
+     switchtobuddyplugin.cpp
+ )
+ 
++qt5_add_resources(kdevswitchtobuddy_PART_SRCS kdevswitchtobuddy.qrc)
+ kdevplatform_add_plugin(kdevswitchtobuddy JSON kdevswitchtobuddy.json SOURCES ${kdevswitchtobuddy_PART_SRCS})
+ 
+ target_link_libraries(kdevswitchtobuddy
+     KDev::Interfaces
+     KDev::Language
+ )
+-
+-install( FILES kdevswitchtobuddy.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdevswitchtobuddy)
+diff --git a/plugins/switchtobuddy/kdevswitchtobuddy.qrc b/plugins/switchtobuddy/kdevswitchtobuddy.qrc
+new file mode 100644
+index 0000000..48c26ea
+--- /dev/null
++++ b/plugins/switchtobuddy/kdevswitchtobuddy.qrc
+@@ -0,0 +1,6 @@
++<!DOCTYPE RCC>
++<RCC version="1.0">
++    <qresource prefix="/kxmlgui5/kdevswitchtobuddy">
++        <file>kdevswitchtobuddy.rc</file>
++    </qresource>
++</RCC>
+diff --git a/plugins/testview/CMakeLists.txt b/plugins/testview/CMakeLists.txt
+index 2168543..cca4a17 100644
+--- a/plugins/testview/CMakeLists.txt
++++ b/plugins/testview/CMakeLists.txt
+@@ -7,9 +7,6 @@ set(kdevtestview_PLUGIN_SRCS
+     testviewdebug.cpp
+ )
+ 
++qt5_add_resources(kdevtestview_PLUGIN_SRCS kdevtestview.qrc)
+ kdevplatform_add_plugin(kdevtestview JSON kdevtestview.json SOURCES ${kdevtestview_PLUGIN_SRCS})
+ target_link_libraries(kdevtestview KF5::ItemModels KDev::Interfaces KDev::Project KDev::Util KDev::Language)
+-
+-########### install files ###############
+-
+-install( FILES kdevtestview.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdevtestview )
+diff --git a/plugins/testview/kdevtestview.qrc b/plugins/testview/kdevtestview.qrc
+new file mode 100644
+index 0000000..f59b00a
+--- /dev/null
++++ b/plugins/testview/kdevtestview.qrc
+@@ -0,0 +1,6 @@
++<!DOCTYPE RCC>
++<RCC version="1.0">
++    <qresource prefix="/kxmlgui5/kdevtestview">
++        <file>kdevtestview.rc</file>
++    </qresource>
++</RCC>
+diff --git a/shell/CMakeLists.txt b/shell/CMakeLists.txt
+index 2ac7691..fdd5fb3 100644
+--- a/shell/CMakeLists.txt
++++ b/shell/CMakeLists.txt
+@@ -106,6 +106,7 @@ ki18n_wrap_ui(KDevPlatformShell_LIB_SRCS
+     settings/templatepage.ui
+ )
+ 
++qt5_add_resources(KDevPlatformShell_LIB_SRCS kdevplatformshell.qrc)
+ kdevplatform_add_library(KDevPlatformShell SOURCES ${KDevPlatformShell_LIB_SRCS})
+ target_link_libraries(KDevPlatformShell
+ LINK_PUBLIC
+@@ -172,7 +173,4 @@ install(FILES
+     DESTINATION ${KDE_INSTALL_INCLUDEDIR}/kdevplatform/shell COMPONENT Devel
+ )
+ 
+-install( FILES debugger/kdevdebuggershellui.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdevdebugger )
+-install( FILES kdevsessionui.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdevsession )
+-install( FILES kdevsourceformatter.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdevsourceformatter )
+ install( FILES AssistantButton.qml assistantpopup.qml DESTINATION ${KDE_INSTALL_DATADIR}/kdevelop )
+diff --git a/shell/kdevplatformshell.qrc b/shell/kdevplatformshell.qrc
+new file mode 100644
+index 0000000..4b75ba1
+--- /dev/null
++++ b/shell/kdevplatformshell.qrc
+@@ -0,0 +1,12 @@
++<!DOCTYPE RCC>
++<RCC version="1.0">
++    <qresource prefix="/kxmlgui5/kdevsession">
++        <file>kdevsessionui.rc</file>
++    </qresource>
++    <qresource prefix="/kxmlgui5/kdevsourceformatter">
++        <file>kdevsourceformatter.rc</file>
++    </qresource>
++    <qresource prefix="/kxmlgui5/kdevdebugger">
++        <file alias="kdevdebuggershellui.rc">debugger/kdevdebuggershellui.rc</file>
++    </qresource>
++</RCC>
