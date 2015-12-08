@@ -1,0 +1,18 @@
+commit 61859094aba43b6601051fa7f87ea5191c3812dc
+Author: Andrew McCann <amccann@gmail.com>
+Date:   Sat Oct 24 21:40:43 2015 -0700
+
+    mark includepathsconverter executable nongui
+
+diff --git a/languages/plugins/custom-definesandincludes/CMakeLists.txt b/languages/plugins/custom-definesandincludes/CMakeLists.txt
+index 810b2dc..011e6b4 100644
+--- a/languages/plugins/custom-definesandincludes/CMakeLists.txt
++++ b/languages/plugins/custom-definesandincludes/CMakeLists.txt
+@@ -39,6 +39,7 @@ target_link_libraries( kdevdefinesandincludesmanager LINK_PRIVATE
+ option(BUILD_kdev_includepathsconverter "Build utility to modify include paths of a project from command line." ON)
+ if(BUILD_kdev_includepathsconverter)
+     add_executable(kdev_includepathsconverter includepathsconverter.cpp)
++    ecm_mark_nongui_executable(kdev_includepathsconverter)
+     target_link_libraries(kdev_includepathsconverter LINK_PRIVATE
+         ${KDEVPLATFORM_PROJECT_LIBRARIES}
+         kdevcompilerprovider
